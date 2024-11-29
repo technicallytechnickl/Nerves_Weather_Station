@@ -15,7 +15,7 @@ defmodule Veml6030 do
       |> Config.new()
 
     Comm.write_config(config, i2c, address)
-    :time.send_interval(1_000, :measure)
+    :timer.send_interval(1_000, :measure)
 
     state = %{
       i2c: i2c,
@@ -50,8 +50,8 @@ defmodule Veml6030 do
     {:noreply, updated_with_reading}
   end
 
-  @imple true
-  def handl_call(:get_measurement, _from, state) do
+  @impl true
+  def handle_call(:get_measurement, _from, state) do
     {:reply, state.last_reading, state}
   end
 
