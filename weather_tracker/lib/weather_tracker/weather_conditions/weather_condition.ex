@@ -8,7 +8,10 @@ defmodule WeatherTracker.WeatherConditions.WeatherCondition do
     :temperature_c,
     :co2_eq_ppm,
     :tvoc_ppb,
-    :light_lumens
+    :light_lumens,
+    :dew_point_c,
+    :humidity_rh,
+    :gas_resistance_ohms
   ]
 
   @derive {Jason.Encoder, only: @allowed_fields}
@@ -21,6 +24,9 @@ defmodule WeatherTracker.WeatherConditions.WeatherCondition do
     field(:co2_eq_ppm, :decimal)
     field(:tvoc_ppb, :decimal)
     field(:light_lumens, :decimal)
+    field(:dew_point_c, :decimal)
+    field(:humidity_rh, :decimal)
+    field(:gas_resistance_ohms, :decimal)
   end
 
   def create_changeset(weather_condition = %__MODULE__{}, attrs) do
