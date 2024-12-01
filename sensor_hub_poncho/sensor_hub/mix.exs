@@ -48,7 +48,8 @@ defmodule SensorHub.MixProject do
       {:shoehorn, "~> 0.9.1"},
       {:ring_logger, "~> 0.11.0"},
       {:toolshed, "~> 0.4.0"},
-      {:circuits_i2c, "~> 0.3.8"},
+      # {:circuits_i2c, "~> 0.3.8"},
+      {:circuits_i2c, "~> 2.0"},
 
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.
@@ -57,6 +58,10 @@ defmodule SensorHub.MixProject do
       # Dependencies for all targets except :host
       {:nerves_pack, "~> 0.7.1", targets: @all_targets},
       {:veml6030, path: "../veml6030", targets: @all_targets},
+      {:sgp30, path: "../sgp30", targets: @all_targets},
+      {:elixir_bme680, "~> 0.2.2", targets: @all_targets},
+      {:bmp280, "~> 0.2.13", targets: @all_targets},
+      {:publisher, path: "../publisher", targets: @all_targets},
 
       # Dependencies for specific targets
       # NOTE: It's generally low risk and recommended to follow minor version

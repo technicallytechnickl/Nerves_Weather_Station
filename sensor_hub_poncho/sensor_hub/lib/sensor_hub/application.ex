@@ -5,19 +5,20 @@ defmodule SensorHub.Application do
 
   use Application
 
+  alias SensorHub.Sensor
+
   @impl true
   def start(_type, _args) do
-    children =
-      [
-        # Children for all targets
-        # Starts a worker by calling: SensorHub.Worker.start_link(arg)
-        # {SensorHub.Worker, arg},
-      ] ++ target_children()
+    # [
+    #   # Children for all targets
+    #   # Starts a worker by calling: SensorHub.Worker.start_link(arg)
+    #   # {SensorHub.Worker, arg},
+    # ] ++ target_children()
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: SensorHub.Supervisor]
-    Supervisor.start_link(children, opts)
+    Supervisor.start_link(target_children(), opts)
   end
 
   # List all child processes to be supervised
@@ -34,10 +35,26 @@ defmodule SensorHub.Application do
   else
     defp target_children() do
       [
-        # Children for all targets except host
-        # Starts a worker by calling: Target.Worker.start_link(arg)
-        # {Target.Worker, arg},
+        {BMP280, [i2c_address: 0x77, name: BME680]},
+        {Veml6030, %{}},
+        {SGP30, []},
+        {Finch, name: WeatherTrackerClient},
+        {
+          Publisher,
+          %{
+            sensors: sensors(),
+            weather_tracker_url: weather_tracker_url()
+          }
+        }
       ]
     end
+  end
+
+  defp sensors() do
+    [Sensor.new(BME680), Sensor.new(VEML6030), Sensor.new(SGP30)]
+  end
+
+  defp weather_tracker_url() do
+    Application.get_env(:sensor_hub, :weather_tracker_url)
   end
 end

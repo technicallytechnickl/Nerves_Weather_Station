@@ -1,9 +1,9 @@
-defmodule Veml6030.MixProject do
+defmodule Publisher.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :veml6030,
+      app: :publisher,
       version: "0.1.0",
       elixir: "~> 1.17",
       start_permanent: Mix.env() == :prod,
@@ -21,8 +21,8 @@ defmodule Veml6030.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # {:circuits_i2c, "~> 0.3.8"}
-      {:circuits_i2c, "~> 2.0"}
+      {:finch, "~> 0.13"},
+      {:jason, "~> 1.2.2"}
       # {:dep_from_hexpm, "~> 0.3.0"},
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
     ]
