@@ -93,7 +93,7 @@ defmodule SGP30 do
   defp execute_event(event, state) do
     case event do
       :measure -> measure(state)
-      :measure_raw -> measure_raw(state)
+      #:measure_raw -> measure_raw(state)
     end
   end
 
