@@ -26,7 +26,7 @@ defmodule Publisher do
 
   @impl true
   def handle_info(:publish_data, state) do
-    {:noreply, state |> measure() |> publish()}
+    {:noreply, state |> measure() |> corrections() |> publish()}
   end
 
   defp measure(state) do
@@ -38,6 +38,10 @@ defmodule Publisher do
 
     %{state | measurements: measurements}
   end
+
+  defp corrections(state) do
+    corrections =
+      Enum.reduce(state.measurements, %{}, )
 
   defp publish(state) do
     result =

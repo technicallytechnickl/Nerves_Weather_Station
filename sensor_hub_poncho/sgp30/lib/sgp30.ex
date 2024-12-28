@@ -90,6 +90,34 @@ defmodule SGP30 do
     {:noreply, state}
   end
 
+  @spec handle_cast({:update_humidity, float()}, map()) :: map()
+  @impl GenServer
+  def handle_cast({:update_humidity, humidity}, state) do
+    # Humidity should be absolute humidity (g/m3) in float format
+
+    {whole, fractional} = split_float(humidity)
+
+    data = <<whole, trunc(fractional * 256)>>
+
+    _ = I2C.write(state.i2c, state.address, <<0x20, 0x61, data, calculate(data)>>)
+
+
+    {:no_reply, state}
+  end
+
+  def split_float(f) when is_float(f) do
+    i = trunc(f)
+
+    {
+      i,
+      Decimal.sub(
+        Decimal.from_float(f),
+        Decimal.new(i)
+      )
+      |> Decimal.to_float()
+    }
+  end
+
   defp execute_event(event, state) do
     case event do
       :measure -> measure(state)
