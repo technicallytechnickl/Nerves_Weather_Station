@@ -6,6 +6,7 @@ defmodule SGP30 do
   use GenServer
 
   require Logger
+  require Decimal
 
   alias Circuits.I2C
   alias SGP30.CRC
@@ -99,7 +100,7 @@ defmodule SGP30 do
 
     data = <<whole, trunc(fractional * 256)>>
 
-    _ = I2C.write(state.i2c, state.address, <<0x20, 0x61, data, calculate(data)>>)
+    _ = I2C.write(state.i2c, state.address, <<0x20, 0x61, data, CRC.calculate(data)>>)
 
 
     {:no_reply, state}
