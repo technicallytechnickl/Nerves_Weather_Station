@@ -53,6 +53,12 @@ defmodule SGP30 do
     GenServer.call(name, :get_state)
   end
 
+  @spec update_humidity(GenServer.server()) :: t()
+  def update_humidity(humidity \\ 0.0) do
+    GenServer.cast(__MODULE__, {:update_humidity, humidity})
+    :ok
+  end
+
   @impl GenServer
   def handle_call(:get_state, _from, state), do: {:reply, state, state}
 
@@ -98,12 +104,17 @@ defmodule SGP30 do
 
     {whole, fractional} = split_float(humidity)
 
-    data = <<whole, trunc(fractional * 256)>>
+    Logger.debug("State: #{inspect(state)}")
+
+    <<data::16>> = <<whole, trunc(fractional * 256)>>
+
+    Logger.debug("DATA: #{inspect(data)}")
 
     _ = I2C.write(state.i2c, state.address, <<0x20, 0x61, data, CRC.calculate(data)>>)
 
+    Logger.debug("State: #{inspect(state)}")
 
-    {:no_reply, state}
+    {:noreply, state}
   end
 
   def split_float(f) when is_float(f) do

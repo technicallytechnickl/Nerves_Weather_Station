@@ -51,6 +51,8 @@ defmodule Publisher do
         end
       end)
 
+      SGP30.update_humidity(corrections[:abs_hum])
+
 
     %{state | corrections: corrections, measurements: measurements}
   end
