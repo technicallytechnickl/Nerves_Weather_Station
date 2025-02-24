@@ -13,7 +13,8 @@ defmodule Publisher do
       interval: options[:interval] || 10_000,
       weather_tracker_url: options[:weather_tracker_url],
       sensors: options[:sensors],
-      measurements: :no_measurements
+      measurements: :no_measurements,
+      corrections: :no_corrections
     }
 
     schedule_next_publish(state.interval)
@@ -36,7 +37,24 @@ defmodule Publisher do
         Map.merge(acc, sensor_data)
       end)
 
-    %{state | measurements: measurements}
+     Logger.debug("Sensors: #{inspect(state.sensors)}")
+
+    corrections =
+      Enum.reduce(state.sensors, %{}, fn sensor, acc ->
+        case sensor.name do
+          Elixir.BME680 ->
+            sensor_calc = sensor.calculate.(measurements)
+            Logger.debug("Corrections: #{inspect(sensor_calc)}")
+            Logger.debug("Measurements: #{inspect(measurements)}")
+            Map.merge(acc, sensor_calc)
+          _ ->  Map.merge(acc, %{})
+        end
+      end)
+
+      SGP30.update_humidity(corrections[:abs_hum])
+
+
+    %{state | corrections: corrections, measurements: measurements}
   end
 
   defp publish(state) do
@@ -49,7 +67,7 @@ defmodule Publisher do
       )
       |> Finch.request(WeatherTrackerClient)
 
-    Logger.debug("Server response: #{inspect(result)}")
+    # Logger.debug("Server response: #{inspect(result)}")
 
     schedule_next_publish(state.interval)
 

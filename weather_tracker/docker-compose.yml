@@ -2,7 +2,7 @@ version: "3.3"
 
 services:
   postgres:
-    image: timescale/timescaledb:2.17.2-pg16
+    image: docker.io/timescale/timescaledb:2.17.2-pg16
     ports:
       - "5432:5432"
     volumes:
@@ -11,7 +11,7 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
   grafana:
-    image: grafana/grafana:main
+    image: docker.io/grafana/grafana:main
     depends_on:
       - postgres
     ports:

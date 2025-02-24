@@ -6,6 +6,7 @@ defmodule SGP30 do
   use GenServer
 
   require Logger
+  require Decimal
 
   alias Circuits.I2C
   alias SGP30.CRC
@@ -52,6 +53,12 @@ defmodule SGP30 do
     GenServer.call(name, :get_state)
   end
 
+  @spec update_humidity(GenServer.server()) :: t()
+  def update_humidity(humidity \\ 0.0) do
+    GenServer.cast(__MODULE__, {:update_humidity, humidity})
+    :ok
+  end
+
   @impl GenServer
   def handle_call(:get_state, _from, state), do: {:reply, state, state}
 
@@ -90,10 +97,43 @@ defmodule SGP30 do
     {:noreply, state}
   end
 
+  @spec handle_cast({:update_humidity, float()}, map()) :: map()
+  @impl GenServer
+  def handle_cast({:update_humidity, humidity}, state) do
+    # Humidity should be absolute humidity (g/m3) in float format
+
+    {whole, fractional} = split_float(humidity)
+
+    Logger.debug("State: #{inspect(state)}")
+
+    <<data::16>> = <<whole, trunc(fractional * 256)>>
+
+    Logger.debug("DATA: #{inspect(data)}")
+
+    _ = I2C.write(state.i2c, state.address, <<0x20, 0x61, data, CRC.calculate(data)>>)
+
+    Logger.debug("State: #{inspect(state)}")
+
+    {:noreply, state}
+  end
+
+  def split_float(f) when is_float(f) do
+    i = trunc(f)
+
+    {
+      i,
+      Decimal.sub(
+        Decimal.from_float(f),
+        Decimal.new(i)
+      )
+      |> Decimal.to_float()
+    }
+  end
+
   defp execute_event(event, state) do
     case event do
       :measure -> measure(state)
-      :measure_raw -> measure_raw(state)
+      #:measure_raw -> measure_raw(state)
     end
   end
 

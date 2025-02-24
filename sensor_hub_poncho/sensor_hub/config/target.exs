@@ -1,6 +1,6 @@
 import Config
 
-config :sensor_hub, :weather_tracker_url, "http://192.168.1.246:4000/api/weather-conditions"
+config :sensor_hub, :weather_tracker_url, "http://143.244.162.110:4000/api/weather-conditions"
 
 # Use Ringlogger as the logger backend and remove :console.
 # See https://hexdocs.pm/ring_logger/readme.html for more information on
